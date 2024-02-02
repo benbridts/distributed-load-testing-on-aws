@@ -2304,9 +2304,22 @@ exports[`Distributed Load Testing stack test 1`] = `
               [
                 "https://",
                 {
-                  "Fn::GetAtt": [
-                    "DLTConsoleResourcesDLTCloudFrontToS3CloudFrontDistribution3EF384B4",
-                    "DomainName",
+                  "Fn::If": [
+                    "BoolAliases",
+                    {
+                      "Fn::Select": [
+                        0,
+                        {
+                          "Ref": "CloudFrontAliases",
+                        },
+                      ],
+                    },
+                    {
+                      "Fn::GetAtt": [
+                        "DLTConsoleResourcesDLTCloudFrontToS3CloudFrontDistribution3EF384B4",
+                        "DomainName",
+                      ],
+                    },
                   ],
                 },
                 "/",
@@ -2333,9 +2346,22 @@ exports[`Distributed Load Testing stack test 1`] = `
               [
                 "https://",
                 {
-                  "Fn::GetAtt": [
-                    "DLTConsoleResourcesDLTCloudFrontToS3CloudFrontDistribution3EF384B4",
-                    "DomainName",
+                  "Fn::If": [
+                    "BoolAliases",
+                    {
+                      "Fn::Select": [
+                        0,
+                        {
+                          "Ref": "CloudFrontAliases",
+                        },
+                      ],
+                    },
+                    {
+                      "Fn::GetAtt": [
+                        "DLTConsoleResourcesDLTCloudFrontToS3CloudFrontDistribution3EF384B4",
+                        "DomainName",
+                      ],
+                    },
                   ],
                 },
                 "/",
@@ -2405,9 +2431,22 @@ exports[`Distributed Load Testing stack test 1`] = `
                 <p>
                     Console: <strong>https://",
                   {
-                    "Fn::GetAtt": [
-                      "DLTConsoleResourcesDLTCloudFrontToS3CloudFrontDistribution3EF384B4",
-                      "DomainName",
+                    "Fn::If": [
+                      "BoolAliases",
+                      {
+                        "Fn::Select": [
+                          0,
+                          {
+                            "Ref": "CloudFrontAliases",
+                          },
+                        ],
+                      },
+                      {
+                        "Fn::GetAtt": [
+                          "DLTConsoleResourcesDLTCloudFrontToS3CloudFrontDistribution3EF384B4",
+                          "DomainName",
+                        ],
+                      },
                     ],
                   },
                   "/</strong>
@@ -3505,17 +3544,43 @@ exports[`Distributed Load Testing stack test 1`] = `
           scope: ['email', 'openid', 'aws.cognito.signin.user.admin', 'profile'],
           redirectSignIn: 'https://",
               {
-                "Fn::GetAtt": [
-                  "DLTConsoleResourcesDLTCloudFrontToS3CloudFrontDistribution3EF384B4",
-                  "DomainName",
+                "Fn::If": [
+                  "BoolAliases",
+                  {
+                    "Fn::Select": [
+                      0,
+                      {
+                        "Ref": "CloudFrontAliases",
+                      },
+                    ],
+                  },
+                  {
+                    "Fn::GetAtt": [
+                      "DLTConsoleResourcesDLTCloudFrontToS3CloudFrontDistribution3EF384B4",
+                      "DomainName",
+                    ],
+                  },
                 ],
               },
               "/',
           redirectSignOut: 'https://",
               {
-                "Fn::GetAtt": [
-                  "DLTConsoleResourcesDLTCloudFrontToS3CloudFrontDistribution3EF384B4",
-                  "DomainName",
+                "Fn::If": [
+                  "BoolAliases",
+                  {
+                    "Fn::Select": [
+                      0,
+                      {
+                        "Ref": "CloudFrontAliases",
+                      },
+                    ],
+                  },
+                  {
+                    "Fn::GetAtt": [
+                      "DLTConsoleResourcesDLTCloudFrontToS3CloudFrontDistribution3EF384B4",
+                      "DomainName",
+                    ],
+                  },
                 ],
               },
               "/',
