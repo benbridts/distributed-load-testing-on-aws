@@ -263,20 +263,24 @@ class Create extends React.Component {
       console.log(payload);
     } else {
         let extension = "jmx";
+        if (values.testType === "jmeter") {
+            extension = "jmx";
+        }
         if (values.testType === "k6") {
           extension = "js";
         }
+        payload.testScenario.execution[0].executor = values.testType;
         payload.testScenario.scenarios[testName] = {
         script: `${testId}.${extension}`,
       };
 
       if (this.state.file) {
-        payload.fileType = await this.uploadFileToScenarioBucket(testId);
+        payload.fileType = await this.uploadFileToScenarioBucket(testId, values.testType);
       }
     }
   }
 
-  async uploadFileToScenarioBucket(testId) {
+  async uploadFileToScenarioBucket(testId, testType = 'jmeter') {
     const file = this.state.file;
     let filename;
     let fileType;
@@ -289,7 +293,7 @@ class Create extends React.Component {
     }
     try {
       this.setState({ isUploading: true });
-      await uploadData({ key: `test-scenarios/jmeter/${filename}`, data: file }).result;
+      await uploadData({ key: `test-scenarios/${testType}/${filename}`, data: file }).result;
       console.log("Script uploaded successfully");
     } catch (error) {
       console.error("Error", error);

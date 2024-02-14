@@ -85,6 +85,8 @@ class Details extends React.Component {
       data.method = data.testScenario.scenarios[`${data.testName}`].requests[0].method;
       data.body = data.testScenario.scenarios[`${data.testName}`].requests[0].body;
       data.headers = data.testScenario.scenarios[`${data.testName}`].requests[0].headers;
+    } else {
+      data.testScenario.execution[0].executor = data.testType;
     }
 
     this.setState({
@@ -138,7 +140,14 @@ class Details extends React.Component {
     try {
       const testId = this.state.testId;
       const { testType } = this.state.data;
-      let filename = this.state.data.fileType === "zip" ? `${testId}.zip` : `${testId}.jmx`;
+      var extension;
+      if (testType === "jmeter") {
+        extension = "jmx";
+      }
+      if (testType === "k6") {
+        extension = "js";
+      }
+      let filename = this.state.data.fileType === "zip" ? `${testId}.zip` : `${testId}.${extension}`;
       const url = await getUrl({ key: `test-scenarios/${testType}/${filename}` });
       window.open(url.url, "_blank");
     } catch (error) {
