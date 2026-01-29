@@ -8,7 +8,7 @@ ENV PIP_INSTALL="pip3.11 install --no-cache-dir"
 
 # install bzt
 RUN $PIP_INSTALL --upgrade pip && \
-    $PIP_INSTALL --upgrade bzt awscli setuptools==78.1.1 h11 && \
+    $PIP_INSTALL --upgrade bzt awscli setuptools h11 && \
     $PIP_INSTALL --upgrade bzt
 COPY ./.bzt-rc /root/.bzt-rc
 RUN chmod 755 /root/.bzt-rc
@@ -37,6 +37,11 @@ RUN rm -rf /tmp/jmeter-plugins-manager-1* && \
 RUN rm -rf /usr/local/lib/python3.11/site-packages/setuptools/_vendor/jaraco.context-5.3.0.dist-info && \
     rm -rf /usr/local/lib/python3.11/site-packages/setuptools/_vendor/jaraco/context.py
 
+# Remove vulnerable vendored wheel from setuptools 79.0.1.
+# bzt will find wheel at /usr/local/lib/python3.11/site-packages/wheel/
+RUN rm -rf /usr/local/lib/python3.11/site-packages/setuptools/_vendor/wheel* && \
+    rm -rf /usr/local/lib/python3.11/site-packages/setuptools/_vendor/__pycache__/wheel*
+
 # Add settings file to capture the output logs from bzt cli
 RUN mkdir -p /etc/bzt.d && echo '{"settings": {"artifacts-dir": "/tmp/artifacts"}}' > /etc/bzt.d/90-artifacts-dir.json
 
@@ -51,11 +56,8 @@ RUN $PIP_INSTALL 'werkzeug>=3.1.4'
 
 # Create non-root user and set permissions
 RUN dnf install -y shadow-utils
-RUN dnf install -y sudo
-RUN groupadd sudo
+RUN dnf install -y tar gzip
 RUN useradd -m -r appuser
-RUN usermod -aG sudo appuser
-RUN echo "appuser ALL=(ALL) NOPASSWD: /usr/bin/rpm" >> /etc/sudoers
 RUN chown -R appuser:appuser /bzt-configs /tmp/artifacts /root/.bzt /root/.bzt-rc /etc/bzt.d
 RUN mv /root/.bzt /home/appuser/.bzt
 RUN mv /root/.bzt-rc /home/appuser/.bzt-rc

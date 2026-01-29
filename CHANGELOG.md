@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.7] - 2026-01-29
+
+### Added
+
+- Update k6 from v0.58.0 to v1.5.0
+
+### Security
+
+- Upgrade python wheel tool to address vulnerabilities in [CVE-2026-24049](https://nvd.nist.gov/vuln/detail/CVE-2026-24049)
+
 ## [4.0.6] - 2026-01-22
 
 ### Security
