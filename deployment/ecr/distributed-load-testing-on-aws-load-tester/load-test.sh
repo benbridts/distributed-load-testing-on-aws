@@ -52,9 +52,77 @@ if [ "$TEST_TYPE" != "simple" ]; then
     echo "cp $PWD/*.jar $JMETER_LIB_PATH"
     cp $PWD/*.jar $JMETER_LIB_PATH 
   elif [ "$TEST_TYPE" == "k6" ]; then
-    curl --output /tmp/artifacts/k6.rpm https://dl.k6.io/rpm/x86_64/k6-v0.58.0-amd64.rpm
-    sudo rpm -ivh /tmp/artifacts/k6.rpm
-    rm -rf /tmp/artifacts/k6.rpm
+    # Detect architecture and set appropriate download URL
+    ARCH=$(uname -m)
+    case "$ARCH" in
+      x86_64)
+        K6_ARCHIVE="k6-v1.5.0-linux-amd64.tar.gz"
+        ;;
+      aarch64|arm64)
+        K6_ARCHIVE="k6-v1.5.0-linux-arm64.tar.gz"
+        ;;
+      *)
+        echo "Unsupported architecture: $ARCH"
+        exit 1
+        ;;
+    esac
+    
+    K6_URL="https://github.com/grafana/k6/releases/download/v1.5.0/$K6_ARCHIVE"
+    CHECKSUMS_URL="https://github.com/grafana/k6/releases/download/v1.5.0/k6-v1.5.0-checksums.txt"
+    
+    # Download k6 archive and checksums
+    echo "Downloading k6 for $ARCH architecture..."
+    curl -L --output "$HOME/$K6_ARCHIVE" "$K6_URL" || {
+      echo "Failed to download k6 archive"
+      exit 1
+    }
+    
+    curl -L --output "$HOME/k6-checksums.txt" "$CHECKSUMS_URL" || {
+      echo "Failed to download k6 checksums"
+      exit 1
+    }
+    
+    # Validate checksum
+    echo "Validating checksum..."
+    EXPECTED_CHECKSUM=$(grep $K6_ARCHIVE "$HOME/k6-checksums.txt" | awk '{print $1}')
+    if [ -z "$EXPECTED_CHECKSUM" ]; then
+      echo "Could not find expected checksum for $K6_ARCHIVE"
+      exit 1
+    fi
+    
+    ACTUAL_CHECKSUM=$(sha256sum "$HOME/$K6_ARCHIVE" | awk '{print $1}')
+    if [ "$EXPECTED_CHECKSUM" != "$ACTUAL_CHECKSUM" ]; then
+      echo "Checksum validation failed!"
+      echo "Expected: $EXPECTED_CHECKSUM"
+      echo "Actual: $ACTUAL_CHECKSUM"
+      exit 1
+    fi
+    echo "Checksum validation passed"
+    
+    # Extract and install k6 directly to /usr/bin
+    echo "Installing k6..."
+    tar -xzf "$HOME/$K6_ARCHIVE" --strip-components=1 -C $HOME || {
+      echo "Failed to extract $HOME/$K6_ARCHIVE"
+      exit 1
+    }
+    
+    # Verify installation
+    if [ ! -x $HOME/k6 ]; then
+      echo "k6 installation failed"
+      exit 1
+    fi
+    
+    # Clean up downloaded files
+    echo "Cleaning up temporary files..."
+    rm -rf "$HOME/$K6_ARCHIVE"
+    rm -rf "$HOME/k6-checksums.txt"
+    
+    # Add the k6 installation dir to the PATH
+    # so that bzt can find it.
+    export PATH=$PATH:$HOME
+    
+    echo "k6 installation succeeded"
+
     EXT="js"
     KPI_EXT="csv"
     TYPE_NAME="K6"
